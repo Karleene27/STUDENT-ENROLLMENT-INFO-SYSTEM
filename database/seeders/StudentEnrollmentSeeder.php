@@ -14,6 +14,12 @@ class StudentEnrollmentSeeder extends Seeder
 {
     public function run()
     {
+        $sections = Section::all();
+        if ($sections->isEmpty()) {
+            $this->command->warn('No sections found. Skipping enrollments.');
+            return;
+        }
+
         $firstNames = [
             'John', 'Jane', 'Michael', 'Sarah', 'David', 'Emma', 'James', 'Maria', 'Robert', 'Lisa',
             'William', 'Patricia', 'Richard', 'Jennifer', 'Thomas', 'Linda', 'Charles', 'Barbara',
@@ -30,7 +36,7 @@ class StudentEnrollmentSeeder extends Seeder
             'Roberts', 'Carter', 'Phillips', 'Evans', 'Turner', 'Torres', 'Parker', 'Collins', 'Edwards', 'Stewart'
         ];
         $programs = ['Computer Science', 'Mathematics', 'Engineering', 'Physics', 'Information Technology', 'Business Administration', 'Fine Arts'];
-        $years = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
+        $yearLevels = ['Freshman', 'Sophomore', 'Junior', 'Senior'];
 
         // Create 100 students
         for ($i = 0; $i < 100; $i++) {
@@ -53,7 +59,7 @@ class StudentEnrollmentSeeder extends Seeder
                 'last_name' => $ln,
                 'date_of_birth' => '200' . rand(0,5) . '-' . rand(1,12) . '-' . rand(1,28),
                 'program' => $programs[array_rand($programs)],
-                'year_level' => $years[array_rand($years)],
+                'year_level' => $yearLevels[array_rand($yearLevels)],
                 'status' => 'Active',
                 'gpa' => round(rand(250, 390) / 100, 2),
                 'advisor_name' => 'Dr. ' . $lastNames[array_rand($lastNames)],
@@ -61,9 +67,7 @@ class StudentEnrollmentSeeder extends Seeder
             ]);
         }
 
-        // Enrollments and payments
         $students = Student::all();
-        $sections = Section::all();
 
         foreach ($students as $student) {
             $randomSections = $sections->random(rand(3, 7));
@@ -87,7 +91,7 @@ class StudentEnrollmentSeeder extends Seeder
                         'enrollment_id' => $enrollment->id,
                         'amount' => $amount,
                         'payment_date' => now(),
-                        'status' => rand(1, 10) <= 3 ? 'paid' : 'pending', // 30% paid
+                        'status' => rand(1, 10) <= 3 ? 'paid' : 'pending',
                         'reference_number' => 'INV-' . strtoupper(uniqid()),
                         'payment_method' => null,
                     ]);

@@ -72,13 +72,13 @@
                     </div>
                 </div>
                 
+                <!-- Semester dropdown now uses 1st Sem / 2nd Sem -->
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label fw-bold">Semester</label>
                         <select name="semester" class="form-select form-control-custom">
-                            <option value="Spring" {{ $course->semester == 'Spring' ? 'selected' : '' }}>Spring</option>
-                            <option value="Summer" {{ $course->semester == 'Summer' ? 'selected' : '' }}>Summer</option>
-                            <option value="Fall" {{ $course->semester == 'Fall' ? 'selected' : '' }}>Fall</option>
+                            <option value="1st Sem" {{ $course->semester == '1st Sem' ? 'selected' : '' }}>1st Sem</option>
+                            <option value="2nd Sem" {{ $course->semester == '2nd Sem' ? 'selected' : '' }}>2nd Sem</option>
                         </select>
                     </div>
                 </div>

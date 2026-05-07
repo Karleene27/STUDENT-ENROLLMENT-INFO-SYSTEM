@@ -11,12 +11,10 @@ use Illuminate\Http\Request;
 class CourseManagementController extends Controller
 {
     public function index()
-    {
-
-    $courses = Course::with('department')->paginate(9);
+{
+    $courses = Course::with('department')->paginate(6);
     return view('admin.courses.index', compact('courses'));
-     
-    }
+}
 
     public function create()
     {

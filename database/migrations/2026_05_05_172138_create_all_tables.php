@@ -68,19 +68,22 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Courses
+        // Courses – composite unique key on (course_code, semester, year)
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
-            $table->string('course_code')->unique();
+            $table->string('course_code');
             $table->string('title');
             $table->text('description')->nullable();
             $table->integer('credits');
             $table->integer('capacity')->default(30);
             $table->foreignId('department_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['Open', 'Limited', 'Full', 'Closed'])->default('Open');
-            $table->string('semester');
+            $table->enum('semester', ['1st Sem', '2nd Sem']);
             $table->integer('year');
             $table->timestamps();
+
+            // Composite unique index – allows same course_code in different semesters/years
+            $table->unique(['course_code', 'semester', 'year'], 'courses_code_semester_year_unique');
         });
 
         // Sections
@@ -109,7 +112,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Payments (includes reference_number)
+        // Payments
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('student_id')->constrained()->onDelete('cascade');

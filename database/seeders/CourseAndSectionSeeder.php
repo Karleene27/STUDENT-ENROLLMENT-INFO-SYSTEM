@@ -11,47 +11,70 @@ class CourseAndSectionSeeder extends Seeder
 {
     public function run()
     {
-        // Ensure departments exist
-        $cs = Department::firstOrCreate(['dept_code' => 'CS'], ['dept_name' => 'Computer Science']);
-        $math = Department::firstOrCreate(['dept_code' => 'MATH'], ['dept_name' => 'Mathematics']);
+        $departments = Department::all();
 
-        $courses = [
-            ['CS101', 'Introduction to Programming', 3, 30, $cs->id],
-            ['CS202', 'Data Structures', 3, 30, $cs->id],
-            ['MATH101', 'College Algebra', 3, 35, $math->id],
+        $subjects = [
+            'CS' => ['Programming', 'Data Structures', 'Algorithms', 'Databases', 'Web Dev', 'Networks', 'OS', 'AI', 'ML', 'Cybersecurity'],
+            'MATH' => ['Algebra', 'Calculus', 'Geometry', 'Stats', 'Discrete Math', 'Linear Algebra', 'Diff Equations'],
+            'ENG' => ['Mechanics', 'Thermodynamics', 'Fluids', 'Electronics', 'Robotics', 'Materials'],
+            'SCI' => ['Physics', 'Chemistry', 'Biology', 'Astronomy', 'Geology', 'Env Science'],
+            'BUS' => ['Marketing', 'Finance', 'Accounting', 'Management', 'Economics'],
+            'ART' => ['Drawing', 'Painting', 'Sculpture', 'Digital Art', 'Photography'],
         ];
 
-        foreach ($courses as $c) {
-            $course = Course::firstOrCreate(
-                ['course_code' => $c[0]],
-                [
-                    'title' => $c[1],
-                    'credits' => $c[2],
-                    'capacity' => $c[3],
-                    'department_id' => $c[4],
-                    'status' => 'Open',
-                    'semester' => 'Spring',
-                    'year' => 2025,
-                ]
-            );
+        $semesters = ['1st Sem', '2nd Sem'];
+        $years = [2024, 2025, 2026, 2027];
 
-            // Add two sections per course
-            for ($i = 0; $i < 2; $i++) {
-                Section::firstOrCreate(
-                    ['course_id' => $course->id, 'section_code' => chr(65 + $i)],
-                    [
-                        'schedule_time' => $i == 0 ? '8:00 AM - 10:00 AM' : '10:00 AM - 12:00 PM',
-                        'schedule_days' => 'MWF',
-                        'room' => 'Room ' . (101 + $i),
-                        'instructor' => 'Prof. ' . ($i == 0 ? 'Santos' : 'Cruz'),
-                        'capacity' => $course->capacity,
-                        'enrolled_count' => 0,
-                        'status' => 'Open',
-                    ]
-                );
+        $times = ['8:00 AM - 10:00 AM', '10:00 AM - 12:00 PM', '1:00 PM - 3:00 PM', '3:00 PM - 5:00 PM'];
+        $days = ['MWF', 'TTh', 'MW', 'TThS'];
+        $rooms = ['Room 101', 'Lab 202', 'Hall 301', 'Auditorium A'];
+        $instructors = ['Prof. Santos', 'Prof. Cruz', 'Prof. Lee', 'Prof. Dela Cruz', 'Prof. Gomez'];
+
+        foreach ($subjects as $deptCode => $titles) {
+            $department = Department::where('dept_code', $deptCode)->first();
+            if (!$department) continue;
+
+            $counter = 101;
+            foreach ($titles as $title) {
+                $courseCode = $deptCode . $counter;
+                foreach ($years as $year) {
+                    foreach ($semesters as $semester) {
+                        $course = Course::firstOrCreate(
+                            [
+                                'course_code' => $courseCode,
+                                'semester' => $semester,
+                                'year' => $year,
+                            ],
+                            [
+                                'title' => $title,
+                                'credits' => rand(3, 4),
+                                'capacity' => rand(25, 45),
+                                'department_id' => $department->id,
+                                'status' => 'Open',
+                            ]
+                        );
+
+                        // Only create sections if none exist for this course (optional)
+                        if ($course->sections()->count() == 0) {
+                            for ($i = 0; $i < 2; $i++) {
+                                Section::create([
+                                    'course_id' => $course->id,
+                                    'section_code' => chr(65 + $i),
+                                    'schedule_time' => $times[array_rand($times)],
+                                    'schedule_days' => $days[array_rand($days)],
+                                    'room' => $rooms[array_rand($rooms)],
+                                    'instructor' => $instructors[array_rand($instructors)],
+                                    'capacity' => $course->capacity,
+                                    'enrolled_count' => 0,
+                                    'status' => 'Open',
+                                ]);
+                            }
+                        }
+                    }
+                }
+                $counter++;
             }
-
-            $this->command->info("Created course {$c[0]} with sections.");
         }
+        $this->command->info('Courses and sections created for years 2024-2027.');
     }
 }
