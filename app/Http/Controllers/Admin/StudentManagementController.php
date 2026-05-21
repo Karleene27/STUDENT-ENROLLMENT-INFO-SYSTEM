@@ -11,6 +11,31 @@ use Illuminate\Support\Str;
 
 class StudentManagementController extends Controller
 {
+
+    public function getDetails(Student $student)
+{
+    return response()->json([
+        'student_id' => $student->student_id,
+        'first_name' => $student->first_name,
+        'last_name' => $student->last_name,
+        'email' => $student->user->email,
+        'program' => $student->program,
+        'year_level' => $student->year_level,
+        'phone' => $student->phone,
+        'address' => $student->address,
+        'applied_on' => $student->created_at->format('F d, Y h:i A'),
+        'mother_name' => $student->mother_name,
+        'mother_occupation' => $student->mother_occupation,
+        'father_name' => $student->father_name,
+        'father_occupation' => $student->father_occupation,
+        'psa_file' => $student->psa_file,
+        'good_moral_file' => $student->good_moral_file,
+        'form137_file' => $student->form137_file,
+        'psa_file_url' => $student->psa_file ? Storage::url($student->psa_file) : null,
+        'good_moral_file_url' => $student->good_moral_file ? Storage::url($student->good_moral_file) : null,
+        'form137_file_url' => $student->form137_file ? Storage::url($student->form137_file) : null,
+    ]);
+}
     public function index()
     {
         $students = Student::with('user')->paginate(10);
@@ -18,10 +43,13 @@ class StudentManagementController extends Controller
     }
     
     public function pending()
-    {
-        $pendingStudents = Student::where('status', 'Pending')->with('user')->get();
-        return view('admin.students.pending', compact('pendingStudents'));
-    }
+{
+    $pendingStudents = Student::where('status', 'Pending')
+        ->with('user')
+        ->paginate(10);  // 👈 use paginate() instead of get()
+
+    return view('admin.students.pending', compact('pendingStudents'));
+}
     
     public function approve(Student $student)
     {
@@ -110,4 +138,5 @@ class StudentManagementController extends Controller
         $user->delete();
         return redirect()->route('admin.students.index')->with('success', 'Student deleted successfully.');
     }
+    
 }

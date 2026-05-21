@@ -60,4 +60,6 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/courses/{course}/sections', [CourseManagementController::class, 'storeSection'])->name('courses.sections.store');
     Route::get('/enrollments', [EnrollmentManagementController::class, 'index'])->name('enrollments.index');
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::post('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
+    Route::get('/students/{student}/details', [StudentManagementController::class, 'getDetails'])->name('admin.students.details');
 });
